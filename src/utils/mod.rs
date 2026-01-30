@@ -15,6 +15,7 @@ use crc::{Crc, CRC_32_ISO_HDLC};
 use openssl::asn1::Asn1Time;
 use serde::{Deserialize, Serialize};
 use serde_cbor::from_slice;
+use sha2::digest::FixedOutputReset;
 use sha2::Digest;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
@@ -41,7 +42,7 @@ use std::path::Path;
 const DEFAULT_SECTIONS_COUNT: u16 = 3;
 
 /// Utility function to calculate PCRs, used at build and describe.
-pub fn get_pcrs<T: Digest + Debug + Write + Clone>(
+pub fn get_pcrs<T: Digest + FixedOutputReset + Debug + Write + Clone>(
     image_hasher: &mut EifHasher<T>,
     bootstrap_hasher: &mut EifHasher<T>,
     app_hasher: &mut EifHasher<T>,
@@ -88,7 +89,7 @@ pub fn get_pcrs<T: Digest + Debug + Write + Clone>(
     Ok(measurements)
 }
 
-pub struct EifBuilder<T: Digest + Debug + Write + Clone> {
+pub struct EifBuilder<T: Digest + FixedOutputReset + Debug + Write + Clone> {
     kernel: File,
     cmdline: Vec<u8>,
     ramdisks: Vec<File>,
@@ -112,7 +113,7 @@ pub struct EifBuilder<T: Digest + Debug + Write + Clone> {
     eif_crc: u32,
 }
 
-impl<T: Digest + Debug + Write + Clone> EifBuilder<T> {
+impl<T: Digest + FixedOutputReset + Debug + Write + Clone> EifBuilder<T> {
     pub fn new(
         kernel_path: &Path,
         cmdline: String,
